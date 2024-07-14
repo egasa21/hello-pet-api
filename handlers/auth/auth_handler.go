@@ -50,3 +50,32 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 
 	helpers.Respond(w, user, true, "User registered successfully", "", http.StatusCreated)
 }
+
+func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
+	var loginReq auth_request.LoginRequest
+	if err := json.NewDecoder(r.Body).Decode(&loginReq); err != nil {
+		helpers.Respond(w, nil, false, err.Error(), "BAD_REQUEST", http.StatusBadRequest)
+		return
+	}
+
+	defer r.Body.Close()
+
+	var user user_model.User
+	if err := h.authRepo.FindUserByEmail(&user, loginReq.Email); err != nil {
+		helpers.Respond(w, nil, false, "user not found", "USER_NOT_FOUND", http.StatusBadRequest)
+		return
+	}
+
+	if !helpers.CheckPasswordHash(loginReq.Password, user.Password) {
+		helpers.Respond(w, nil, false, "Invalid passworx", "UNAUTHORIZED", http.StatusUnauthorized)
+		return
+	}
+
+	token, err := helpers.CreateAccessToken(user.Email)
+	if err != nil {
+		helpers.Respond(w, nil, false, "Error creating access token", "INTERNAL_SERVER_ERROR", http.StatusInternalServerError)
+		return
+	}
+
+	helpers.Respond(w, map[string]string{"access_token": token}, true, "Login Successfully", "", http.StatusOK)
+}

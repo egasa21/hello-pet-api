@@ -18,7 +18,7 @@ func (repo *AuthRepository) Register(user *user_model.User) (err error) {
 	return
 }
 
-func (repo *AuthRepository) FindUser(user *user_model.User, userReq string) (token string, err error) {
+func (repo *AuthRepository) FindUserByEmail(user *user_model.User, userReq string) (err error) {
 	err = repo.db.Database.Where("email = ?", userReq).First(&user).Error
 	return
 }

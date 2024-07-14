@@ -12,4 +12,6 @@ func RegisterRoutes(router *chi.Mux, db *database.DB) {
 	})
 
 	// Add router here
+	AuthRoutes(router, db)
+	CustomerRoutes(router, db)
 }

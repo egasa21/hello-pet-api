@@ -51,7 +51,7 @@ func ExtractEmailFromToken(tokenStr string) (string, error) {
 	return "", errors.New("invalid token")
 }
 
-func GetCurrentUse(r *http.Request) (string, error) {
+func GetCurrentUser(r *http.Request) (string, error) {
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" {
 		return "", errors.New("no auth header")
