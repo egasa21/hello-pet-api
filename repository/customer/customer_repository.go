@@ -28,7 +28,7 @@ func (repo *CustomerRepository) UpdateCustomer(customer *customer_model.Customer
 	return
 }
 
-func (repo *CustomerRepository) DeleteCustomer(customerId uint) (err error) {
+func (repo *CustomerRepository) DeleteCustomer(customerId string) (err error) {
 	err = repo.db.Database.Delete(&customer_model.Customer{}, "id=?", customerId).Error
 	return
 }
