@@ -54,5 +54,10 @@ func (h *CustomerHandler) CreateCustomer(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	if err := h.customerRepository.LoadUser(&customer); err != nil {
+		helpers.Respond(w, nil, false, err.Error(), "INTERNAL_SERVER_ERROR", http.StatusInternalServerError)
+		return
+	}
+
 	helpers.Respond(w, customer, true, "User registered successfully", "", http.StatusCreated)
 }

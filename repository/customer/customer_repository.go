@@ -37,3 +37,8 @@ func (repo *CustomerRepository) GetAllCustomers(customers []customer_model.Custo
 	err = repo.db.Database.Find(&customers).Error
 	return
 }
+
+func (repo *CustomerRepository) LoadUser(customer *customer_model.Customer) (err error) {
+	err = repo.db.Database.Model(customer).Association("User").Find(&customer.User)
+	return
+}

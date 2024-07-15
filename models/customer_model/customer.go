@@ -7,7 +7,7 @@ import (
 
 type Customer struct {
 	gorm.Model
-	ID         uint            `gorm:"primaryKey;autoIncrement:false"`
+	ID         uint            `gorm:"primaryKey;autoIncrement"`
 	UserID     uint            `gorm:"not null"`
 	User       user_model.User `gorm:"foreignKey:UserID"`
 	Name       string
