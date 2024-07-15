@@ -8,4 +8,5 @@ type User struct {
 	Username string `gorm:"type:varchar(255);unique"`
 	Email    string `gorm:"type:varchar(255);unique"`
 	Password string `gorm:"type:varchar(255);not null"`
+	IsAdmin  bool   `gorm:"default:false"`
 }
