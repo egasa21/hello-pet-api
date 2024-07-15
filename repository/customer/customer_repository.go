@@ -18,7 +18,7 @@ func (repo *CustomerRepository) CreateCustomer(customer *customer_model.Customer
 	return
 }
 
-func (repo *CustomerRepository) GetCustomerById(customerId uint) (customer *customer_model.Customer, err error) {
+func (repo *CustomerRepository) GetCustomerById(customer *customer_model.Customer, customerId string) (err error) {
 	err = repo.db.Database.Preload("User").First(&customer, "id=?", customerId).Error
 	return
 }

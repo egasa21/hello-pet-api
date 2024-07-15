@@ -15,5 +15,7 @@ func CustomerRoutes(router *chi.Mux, db *database.DB) {
 
 	router.Route("/api/customers", func(r chi.Router) {
 		r.Post("/create", customerHandler.CreateCustomer)
+		r.Get("/{customerID}", customerHandler.GetCustomer)
+		r.Put("/{customerID}", customerHandler.UpdateCustomer)
 	})
 }
