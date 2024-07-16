@@ -13,11 +13,11 @@ var (
 	secretKey = []byte(viper.GetString("secret"))
 )
 
-func CreateAccessToken(email, role string) (string, error) {
+func CreateAccessToken(email string, isAdmin bool) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"email": email,
-		"role":  role,
-		"exp":   time.Now().Add(time.Hour * 24).Unix(),
+		"email":   email,
+		"isAdmin": isAdmin,
+		"exp":     time.Now().Add(time.Hour * 24).Unix(),
 	})
 	tokenString, err := token.SignedString(secretKey)
 	if err != nil {
@@ -52,32 +52,36 @@ func ExtractEmailFromToken(tokenStr string) (string, error) {
 	return "", errors.New("invalid token")
 }
 
-func ExtractRoleFromToken(tokenStr string) (string, error) {
+func ExtractIsAdminFromToken(tokenStr string) (bool, error) {
 	token, err := ParseToken(tokenStr)
 	if err != nil {
-		return "", nil
+		return false, err
 	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		role, ok := claims["role"].(string)
+		isAdmin, ok := claims["isAdmin"].(bool)
 		if !ok {
-			return "", errors.New("role not valid")
+			return false, errors.New("admin role required")
 		}
-		return role, nil
+		return isAdmin, nil
 	}
-	return "", errors.New("invalid token")
+	return false, errors.New("invalid token")
 }
 
-func GetCurrentUser(r *http.Request) (string, error) {
+func GetCurrentUser(r *http.Request) (string, bool, error) {
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" {
-		return "", errors.New("no auth header")
+		return "", false, errors.New("no auth header")
 	}
 
 	tokenStr := strings.TrimPrefix(authHeader, "Bearer ")
 	email, err := ExtractEmailFromToken(tokenStr)
 	if err != nil {
-		return "", err
+		return "", false, err
 	}
-	return email, nil
+	isAdmin, err := ExtractIsAdminFromToken(tokenStr)
+	if err != nil {
+		return "", false, err
+	}
+	return email, isAdmin, nil
 }

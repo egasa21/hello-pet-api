@@ -42,3 +42,7 @@ func (repo *CustomerRepository) LoadUser(customer *customer_model.Customer) (err
 	err = repo.db.Database.Model(customer).Association("User").Find(&customer.User)
 	return
 }
+
+func (repo *CustomerRepository) GetById(id uint, dest interface{}) error {
+	return repo.db.Database.First(dest, id).Error
+}

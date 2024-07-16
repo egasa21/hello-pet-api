@@ -71,7 +71,7 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := helpers.CreateAccessToken(user.Email)
+	token, err := helpers.CreateAccessToken(user.Email, user.IsAdmin)
 	if err != nil {
 		helpers.Respond(w, nil, false, "Error creating access token", "INTERNAL_SERVER_ERROR", http.StatusInternalServerError)
 		return

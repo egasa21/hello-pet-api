@@ -11,3 +11,7 @@ func NewGormRepository(db *database.DB) *GormRepository {
 		db: db,
 	}
 }
+
+type Repository interface {
+	GetById(id uint, dest interface{}) error
+}

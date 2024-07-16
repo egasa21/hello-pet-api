@@ -30,7 +30,7 @@ func (h *CustomerHandler) CreateCustomer(w http.ResponseWriter, r *http.Request)
 
 	defer r.Body.Close()
 
-	email, err := helpers.GetCurrentUser(r)
+	email, _, err := helpers.GetCurrentUser(r)
 	if err != nil {
 		helpers.Respond(w, nil, false, err.Error(), "BAD_REQUEST", http.StatusBadRequest)
 		return
