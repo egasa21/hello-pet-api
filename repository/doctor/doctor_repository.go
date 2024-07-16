@@ -33,7 +33,7 @@ func (repo *DoctorRepository) GetAllDoctors(doctors []doctor_model.Doctor) (err 
 	return
 }
 
-func (repo *DoctorRepository) DeleteDoctor(doctorId string) (err error) {
-	err = repo.db.Database.Delete(&doctor_model.Doctor{}, "id=?", doctorId).Error
+func (repo *DoctorRepository) DeleteDoctor(doctor *doctor_model.Doctor) (err error) {
+	err = repo.db.Database.Delete(doctor).Error
 	return
 }

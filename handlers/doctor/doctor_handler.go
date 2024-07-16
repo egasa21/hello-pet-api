@@ -92,3 +92,20 @@ func (h *DoctorHandler) UpdateDoctor(w http.ResponseWriter, r *http.Request) {
 
 	helpers.Respond(w, doctor, true, "Doctor updated successfully", "", http.StatusOK)
 }
+
+func (h *DoctorHandler) DeleteDoctor(w http.ResponseWriter, r *http.Request) {
+	doctorID := chi.URLParam(r, "doctorID")
+
+	var doctor doctor_model.Doctor
+	if err := h.doctorRepository.GetDoctorById(&doctor, doctorID); err != nil {
+		helpers.Respond(w, nil, false, err.Error(), "NOT_FOUND", http.StatusNotFound)
+		return
+	}
+
+	if err := h.doctorRepository.DeleteDoctor(&doctor); err != nil {
+		helpers.Respond(w, nil, false, err.Error(), "INTERNAL_SERVER_ERROR", http.StatusInternalServerError)
+		return
+	}
+
+	helpers.Respond(w, doctor, true, "Doctor deleted successfully", "", http.StatusOK)
+}
