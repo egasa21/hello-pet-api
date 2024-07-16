@@ -13,9 +13,10 @@ var (
 	secretKey = []byte(viper.GetString("secret"))
 )
 
-func CreateAccessToken(email string) (string, error) {
+func CreateAccessToken(email, role string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"email": email,
+		"role":  role,
 		"exp":   time.Now().Add(time.Hour * 24).Unix(),
 	})
 	tokenString, err := token.SignedString(secretKey)
@@ -47,6 +48,22 @@ func ExtractEmailFromToken(tokenStr string) (string, error) {
 			return "", errors.New("email not valid")
 		}
 		return email, nil
+	}
+	return "", errors.New("invalid token")
+}
+
+func ExtractRoleFromToken(tokenStr string) (string, error) {
+	token, err := ParseToken(tokenStr)
+	if err != nil {
+		return "", nil
+	}
+
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		role, ok := claims["role"].(string)
+		if !ok {
+			return "", errors.New("role not valid")
+		}
+		return role, nil
 	}
 	return "", errors.New("invalid token")
 }

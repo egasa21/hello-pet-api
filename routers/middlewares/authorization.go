@@ -10,6 +10,7 @@ import (
 type contextKey string
 
 const UserKey contextKey = "user"
+const AdminKey contextKey = "admin"
 
 func IsAuthorized(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -36,4 +37,40 @@ func IsAuthorized(next http.Handler) http.Handler {
 	})
 }
 
-//todo add admin role
+func IsAdmin(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		authHeader := r.Header.Get("Authorization")
+		if authHeader == "" {
+			helpers.Respond(w, nil, false, "No Authorization", "UNAUTHORIZED", http.StatusUnauthorized)
+			return
+		}
+
+		tokenStr := strings.TrimPrefix(authHeader, "Bearer ")
+		if tokenStr == authHeader {
+			helpers.Respond(w, nil, false, "Invalid Authorization header format", "UNAUTHORIZED", http.StatusUnauthorized)
+			return
+		}
+
+		_, err := helpers.ParseToken(tokenStr)
+		if err != nil {
+			helpers.Respond(w, nil, false, "Invalid token", "UNAUTHORIZED", http.StatusUnauthorized)
+			return
+		}
+
+		role, err := helpers.ExtractRoleFromToken(tokenStr)
+		if err != nil || role != "admin" {
+			helpers.Respond(w, nil, false, "Forbidden", "FORBIDDEN", http.StatusForbidden)
+			return
+		}
+
+		email, err := helpers.ExtractEmailFromToken(tokenStr)
+		if err != nil {
+			helpers.Respond(w, nil, false, "Invalid token", "UNAUTHORIZED", http.StatusUnauthorized)
+			return
+		}
+
+		ctx := context.WithValue(r.Context(), AdminKey, email)
+		next.ServeHTTP(w, r.WithContext(ctx))
+
+	})
+}
